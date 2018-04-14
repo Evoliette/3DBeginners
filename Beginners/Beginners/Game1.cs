@@ -15,6 +15,7 @@ namespace Beginners
         float radius = 2f;
         float range = 10;
         int timer;
+        int record;
 
         //camera
         Vector3 camPosition;
@@ -28,6 +29,7 @@ namespace Beginners
         Texture2D looser;
         Texture2D won;
         SpriteFont counter;
+        SpriteFont recordCounter;
 
         //stuff
         Random random = new Random();
@@ -69,6 +71,7 @@ namespace Beginners
 
             //timer
             timer = 30000;
+            record = 0;
         }
 
         protected override void LoadContent()
@@ -84,6 +87,7 @@ namespace Beginners
             looser = Content.Load<Texture2D>("YouLost2");
             won = Content.Load<Texture2D>("win");
             counter = Content.Load<SpriteFont>("NewSpriteFont");
+            recordCounter = Content.Load<SpriteFont>("counterSprite");
         }
 
         protected override void UnloadContent()
@@ -137,9 +141,10 @@ namespace Beginners
                 //set back the bullets
 
                 timer = timer - gameTime.ElapsedGameTime.Milliseconds;
-                if (timer == 0)
+                if (timer <= 0)
                 {
                     winner = true;
+                    record++;
                 }
                 //timer
 
@@ -160,6 +165,7 @@ namespace Beginners
                 if (hit)
                 {
                     gameOver = true;
+                    record = 0;
 
                 }
 
@@ -182,7 +188,7 @@ namespace Beginners
                 }
                 gameOver = false;
                 winner = false;
-                timer = 30000;
+                timer = 30000;  
             }
             //restart
 
@@ -220,7 +226,6 @@ namespace Beginners
             if (gameOver)
             {
                 spriteBatch.Draw(looser, new Rectangle(0,0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.White);
-                
             }
            if(winner)
             {
@@ -228,6 +233,7 @@ namespace Beginners
             }
 
         spriteBatch.DrawString(counter, timer.ToString(), new Vector2(0, 0), Color.White);
+        spriteBatch.DrawString(recordCounter,"wins:  "+record.ToString(), new Vector2(0, graphics.PreferredBackBufferHeight-30), Color.White);
             spriteBatch.End();
             base.Draw(gameTime);
         }

@@ -119,3 +119,9 @@
 /processorParam:TextureFormat=DxtCompressed
 /build:acagamics02.dae
 
+#begin counterSprite.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:counterSprite.spritefont
+
