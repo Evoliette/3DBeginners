@@ -34,7 +34,11 @@ namespace Beginners
         bool hit;
         float radius = 2f;
         bool gameOver;
+        bool winner;
         Texture2D looser;
+        Texture2D won;
+        SpriteFont counter;
+        int timer = 10000;
        
 
         public Game1()
@@ -87,6 +91,8 @@ namespace Beginners
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             looser = Content.Load<Texture2D>("YouLost2");
+            won = Content.Load<Texture2D>("win");
+            counter = Content.Load<SpriteFont>("NewSpriteFont");
         }
 
         protected override void UnloadContent()
@@ -100,7 +106,7 @@ namespace Beginners
                 Keys.Escape))
                 Exit();
 
-        if (!gameOver) { 
+        if (!gameOver && !winner) { 
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
             {
                 modelPosition[0].X -= 0.3f;
@@ -110,13 +116,12 @@ namespace Beginners
                 }
             }
 
+            timer = timer - gameTime.ElapsedGameTime.Milliseconds;
+
             modelPosition[1].Z += 0.55f;
             modelPosition[2].Z += 0.4f;
             modelPosition[3].Z += 0.45f;
             modelPosition[4].Z += 0.5f;
-
-
-
 
             for (int i = 1; i <= max_models-1; i++)
             {
@@ -148,6 +153,11 @@ namespace Beginners
                 camPosition = Vector3.Transform(camPosition,
                               rotationMatrix);
             }
+
+            if (timer == 0)
+                {
+                    winner = true;
+                }
 
             hit = false;
 
@@ -191,6 +201,7 @@ namespace Beginners
                     modelPosition[j] = new Vector3((float)random.NextDouble() * range * 2 - range, 0, -30f);
                 }
                 gameOver = false;
+                winner = false;
             }
 
             base.Update(gameTime);
@@ -199,6 +210,7 @@ namespace Beginners
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             for (int i = 0; i < model.Length; i++)
             {
                 foreach (ModelMesh mesh in model[i].Meshes)
@@ -222,13 +234,18 @@ namespace Beginners
                     mesh.Draw();
                 }
             }
-
+            spriteBatch.Begin();
             if (gameOver)
-            {
-                spriteBatch.Begin();
+            {         
                 spriteBatch.Draw(looser, new Rectangle(0,0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.White);
-                spriteBatch.End();
             }
+            if(winner)
+             { 
+                spriteBatch.Draw(won, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.White);
+             }
+
+        spriteBatch.DrawString(counter, timer.ToString(), new Vector2(0, 0), Color.White);
+            spriteBatch.End();
             base.Draw(gameTime);
         }
     }
