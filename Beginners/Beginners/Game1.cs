@@ -5,15 +5,16 @@ using System;
 
 namespace Beginners
 {
-    /// <summary>
-    /// This is the main type for your game.
-    /// </summary>
     public class Game1 : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        //constants and values
         const int max_models = 5;
+        float radius = 2f;
+        float range = 10;
+        int timer = 30000;
 
         //Camera
         Vector3 camPosition;
@@ -21,26 +22,19 @@ namespace Beginners
         Matrix viewMatrix;
         Matrix[] worldMatrix = new Matrix[max_models];
 
-        //Geometric info
+        //Geometrics and Objects
         Model[] model = new Model[max_models];
         Vector3[] modelPosition = new Vector3[max_models];
-        float range = 10;
-        
-        //Orbit
-        bool orbit = false;
-
-        //Sonstiges
-        Random random = new Random();
-        bool hit;
-        float radius = 2f;
-        bool gameOver;
-        bool winner;
         Texture2D looser;
         Texture2D won;
         SpriteFont counter;
-        int timer = 10000;
-       
 
+        //Stuff
+        Random random = new Random();
+        bool hit;
+        bool gameOver;
+        bool winner;
+ 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -56,39 +50,33 @@ namespace Beginners
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(
                                MathHelper.ToRadians(45f), graphics.
                                GraphicsDevice.Viewport.AspectRatio,
-                1f, 1000f);
+                               1f, 1000f);
             viewMatrix = Matrix.CreateLookAt(camPosition, new Vector3(0, 0, -5),
                          new Vector3(0f, 1f, 0f));// Y up
 
+            //Startpositions
             modelPosition[0] = new Vector3(0f, 0f, 0f);
+
             modelPosition[1] = new Vector3((float)random.NextDouble() * range - range, 0, -30f);
             modelPosition[2] = new Vector3((float)random.NextDouble() * range + range, 0, -30f);
             modelPosition[3] = new Vector3((float)random.NextDouble() * range * 2 - range, 0, -30f);
             modelPosition[4] = new Vector3((float)random.NextDouble() * range * 2 - range, 0, -30f);
 
-            worldMatrix[0] = Matrix.CreateWorld(modelPosition[0], Vector3.
-                          Forward, Vector3.Up);
-            worldMatrix[1] = Matrix.CreateWorld(modelPosition[1], Vector3.
-                          Forward, Vector3.Up);
-            worldMatrix[2] = Matrix.CreateWorld(modelPosition[2], Vector3.
-                          Forward, Vector3.Up);
-            worldMatrix[3] = Matrix.CreateWorld(modelPosition[3], Vector3.
-                          Forward, Vector3.Up);
-            worldMatrix[4] = Matrix.CreateWorld(modelPosition[3], Vector3.
-                          Forward, Vector3.Up);
-
-            model[0] = Content.Load<Model>("acagamics6");
-            model[1] = Content.Load<Model>("bullets");
-            model[2] = Content.Load<Model>("bullets");
-            model[3] = Content.Load<Model>("bullets");
-            model[4] = Content.Load<Model>("bullets");
-
-
-
+            for(int i=1; i<max_models; i++)
+            {
+            worldMatrix[i] = Matrix.CreateWorld(modelPosition[i], Vector3.Forward, Vector3.Up);
+            }
         }
+
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
+            model[0] = Content.Load<Model>("acagamics6");
+
+            for (int i=1; i<max_models; i++)
+            {
+                model[i] = Content.Load<Model>("bullets");
+            }
+
             spriteBatch = new SpriteBatch(GraphicsDevice);
             looser = Content.Load<Texture2D>("YouLost2");
             won = Content.Load<Texture2D>("win");
@@ -107,6 +95,7 @@ namespace Beginners
                 Exit();
 
         if (!gameOver && !winner) { 
+
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
             {
                 modelPosition[0].X -= 0.3f;
@@ -116,7 +105,14 @@ namespace Beginners
                 }
             }
 
-            timer = timer - gameTime.ElapsedGameTime.Milliseconds;
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            {
+                modelPosition[0].X += 0.3f;
+                if (modelPosition[0].X > range)
+                {
+                     modelPosition[0].X = range;
+                }
+            }
 
             modelPosition[1].Z += 0.55f;
             modelPosition[2].Z += 0.4f;
@@ -130,29 +126,8 @@ namespace Beginners
                     modelPosition[i] = new Vector3((float)random.NextDouble() * range * 2 - range, 0, -30f);
                 }
             }
-        
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
-            {
-                modelPosition[0].X += 0.3f;
-                if(modelPosition[0].X > range)
-                {
-                    modelPosition[0].X = range;
-                }
-            }
-   
-            if (Keyboard.GetState().IsKeyDown(Keys.Space))
-            {
-                orbit = !orbit;
-            }
-
-            if (orbit)
-            {
-                Matrix rotationMatrix = Matrix.CreateRotationY(
-                                        MathHelper.ToRadians(1f));
-                camPosition = Vector3.Transform(camPosition,
-                              rotationMatrix);
-            }
+      
+            timer = timer - gameTime.ElapsedGameTime.Milliseconds;
 
             if (timer == 0)
                 {
@@ -177,22 +152,19 @@ namespace Beginners
                 {
                     gameOver = true;
                        
-                   }
+                }
 
          
-    //viewMatrix = Matrix.CreateLookAt(camPosition, camTarget,
-    //             Vector3.Up);
+             //viewMatrix = Matrix.CreateLookAt(camPosition, camTarget,Vector3.Up);
+             //camTarget = modelPosition;
+             //camera follows player
 
-    //camTarget = modelPosition;
-    //so guckt die Kamera auf Position des Spielers
-
-    worldMatrix[0] = Matrix.CreateWorld(modelPosition[0], Vector3.Forward, Vector3.Up);
-            worldMatrix[1] = Matrix.CreateWorld(modelPosition[1], Vector3.Forward, Vector3.Up);
-            worldMatrix[2] = Matrix.CreateWorld(modelPosition[2], Vector3.Forward, Vector3.Up);
-            worldMatrix[3] = Matrix.CreateWorld(modelPosition[3], Vector3.Forward, Vector3.Up);
-            worldMatrix[4] = Matrix.CreateWorld(modelPosition[4], Vector3.Forward, Vector3.Up);
-                //aktualisiert die Figurpositionen
+            for(int i=0; i < max_models; i++)
+            {
+                worldMatrix[i] = Matrix.CreateWorld(modelPosition[i], Vector3.Forward, Vector3.Up);
             }
+             //aktualisiert die Figurpositionen
+        }
 
         else if (Keyboard.GetState().IsKeyDown(Keys.Enter))
             {
@@ -218,17 +190,17 @@ namespace Beginners
                     foreach (BasicEffect effect in mesh.Effects)
                     {
                         effect.EnableDefaultLighting();
-                        effect.AmbientLightColor = new Vector3(1, 1, 1);
+                        effect.AmbientLightColor = new Vector3(1, 1, 1);    //Color of light
                         effect.View = viewMatrix;
                         effect.World = worldMatrix[i];
                         effect.Projection = projectionMatrix;
                         if(i == 0)
                         {
-                            effect.DiffuseColor = new Vector3(.7f, .2f, 0);
+                            effect.DiffuseColor = new Vector3(.7f, .2f, 0); //Player = orange
                         }
-                        else if (i == 1)
+                        else 
                         {
-                            effect.DiffuseColor = new Vector3(.5f,.5f,.5f);
+                            effect.DiffuseColor = new Vector3(.5f,.5f,.5f); //Others = white
                         }
                     }
                     mesh.Draw();
