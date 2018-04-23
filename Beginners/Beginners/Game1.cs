@@ -11,7 +11,7 @@ namespace Beginners
         SpriteBatch spriteBatch;
 
         //constants and values
-        const int max_models = 5;
+        const int max_models = 6;
         float radius = 2f;
         float range = 10;
         int timer;
@@ -63,8 +63,9 @@ namespace Beginners
             modelPosition[2] = new Vector3((float)random.NextDouble() * range + range, 0, -30f);
             modelPosition[3] = new Vector3((float)random.NextDouble() * range * 2 - range, 0, -30f);
             modelPosition[4] = new Vector3((float)random.NextDouble() * range * 2 - range, 0, -30f);
+            modelPosition[5] = new Vector3((float)random.NextDouble() * range * 2 - range, 0, -30f);
 
-            for(int i=1; i<max_models; i++)
+            for (int i=1; i<max_models; i++)
             {
             worldMatrix[i] = Matrix.CreateWorld(modelPosition[i], Vector3.Forward, Vector3.Up);
             }
@@ -78,10 +79,11 @@ namespace Beginners
         {
             model[0] = Content.Load<Model>("acagamics6");
 
-            for (int i=1; i<max_models; i++)
-            {
-                model[i] = Content.Load<Model>("bullets");
-            }
+            model[1] = Content.Load<Model>("FGHG");
+            model[2] = Content.Load<Model>("FFHW");
+            model[3] = Content.Load<Model>("FFMB");
+            model[4] = Content.Load<Model>("FINF");
+            model[5] = Content.Load<Model>("FFMED");
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
             looser = Content.Load<Texture2D>("YouLost2");
@@ -127,8 +129,9 @@ namespace Beginners
 
                 modelPosition[1].Z += 0.55f;
                 modelPosition[2].Z += 0.4f;
-                modelPosition[3].Z += 0.45f;
+                modelPosition[3].Z += 0.36f;
                 modelPosition[4].Z += 0.5f;
+                modelPosition[5].Z += 0.5f;
                 //speed of the bullets
 
                 for (int i = 1; i <= max_models - 1; i++)
@@ -206,7 +209,7 @@ namespace Beginners
                     foreach (BasicEffect effect in mesh.Effects)
                     {
                         effect.EnableDefaultLighting();
-                        effect.AmbientLightColor = new Vector3(1, 1, 1);    //color of light
+                        effect.AmbientLightColor = new Vector3(1,1,1)*0.9f;    //color of light
                         effect.View = viewMatrix;
                         effect.World = worldMatrix[i];
                         effect.Projection = projectionMatrix;
@@ -214,10 +217,10 @@ namespace Beginners
                         {
                             effect.DiffuseColor = new Vector3(.7f, .2f, 0); //player = orange
                         }
-                        else 
+                    /*    else 
                         {
                             effect.DiffuseColor = new Vector3(.5f,.5f,.5f); //others = white
-                        }
+                        }*/
                     }
                     mesh.Draw();
                 }
