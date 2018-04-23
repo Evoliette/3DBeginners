@@ -34,9 +34,12 @@ namespace Beginners
         //stuff
         Random random = new Random();
         bool hit;
+        bool pointer;
         bool gameOver;
         bool winner;
- 
+
+        bool[] ballsHit = new bool[max_models];
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -46,6 +49,10 @@ namespace Beginners
         protected override void Initialize()
         {
             base.Initialize();
+
+            graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            graphics.ToggleFullScreen();
 
             //camera
             camPosition = new Vector3(0f, 15f, 10f);
@@ -65,13 +72,8 @@ namespace Beginners
             modelPosition[4] = new Vector3((float)random.NextDouble() * range * 2 - range, 0, -30f);
             modelPosition[5] = new Vector3((float)random.NextDouble() * range * 2 - range, 0, -30f);
 
-            for (int i=1; i<max_models; i++)
-            {
-            worldMatrix[i] = Matrix.CreateWorld(modelPosition[i], Vector3.Forward, Vector3.Up);
-            }
-
             //timer
-            timer = 30000;
+            //timer = 30000;
             record = 0;
         }
 
@@ -143,16 +145,23 @@ namespace Beginners
                 }
                 //set back the bullets
 
-                timer = timer - gameTime.ElapsedGameTime.Milliseconds;
+        /*        timer = timer - gameTime.ElapsedGameTime.Milliseconds;
                 if (timer <= 0)
                 {
                     winner = true;
                     record++;
-                }
+                }*/
                 //timer
 
                 //collision
                 hit = false;
+                pointer = false;
+
+                for(int i = 0; i < max_models; i++)
+                {
+                    ballsHit[i] = false;
+                }
+
                 for (int i = 1; i <= max_models - 1; i++)
                 {
 
@@ -160,17 +169,41 @@ namespace Beginners
                     {
                         if (Math.Abs(modelPosition[i].X - modelPosition[0].X) <= radius && Math.Abs(modelPosition[i].Z - modelPosition[0].Z) <= radius)
                         {
-                            hit = true;
+                            //hit = true;
+                            ballsHit[i] = true;
                         }
                     }
                 }
 
-                if (hit)
+                for (int i = 2; i <= max_models-1; i++)
+                {
+
+                    if (!hit)
+                    {
+                        if (Math.Abs(modelPosition[i].X - modelPosition[0].X) <= radius && Math.Abs(modelPosition[i].Z - modelPosition[0].Z) <= radius)
+                        {
+                            //record++;
+                        }
+                    }
+                }
+
+                if (hit || ballsHit[1])
                 {
                     gameOver = true;
-                    record = 0;
+                  
 
                 }
+
+                for(int i = 2; i < max_models; i++)
+                {
+                    if(ballsHit[i])
+                    {
+                        record++;
+                        modelPosition[i] = new Vector3((float)random.NextDouble() * range * 2 - range, 0, -30f);
+                    }
+                   
+                }
+                
 
                 //viewMatrix = Matrix.CreateLookAt(camPosition, camTarget,Vector3.Up);
                 //camTarget = modelPosition;
