@@ -224,7 +224,8 @@ namespace Beginners
                 }
                 gameOver = false;
                 winner = false;
-                timer = 30000;  
+                record = 0;
+            //    timer = 30000;  
             }
             //restart
 
@@ -268,7 +269,7 @@ namespace Beginners
                 spriteBatch.Draw(won, new Rectangle(100, 0, graphics.PreferredBackBufferWidth - 200, graphics.PreferredBackBufferHeight), Color.White);
             }
 
-        spriteBatch.DrawString(counter, timer.ToString(), new Vector2(0, 0), Color.White);
+       // spriteBatch.DrawString(counter, timer.ToString(), new Vector2(0, 0), Color.White);
         spriteBatch.DrawString(recordCounter,"wins:  "+record.ToString(), new Vector2(0, graphics.PreferredBackBufferHeight-30), Color.White);
             spriteBatch.End();
             base.Draw(gameTime);
